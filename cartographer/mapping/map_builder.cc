@@ -82,6 +82,8 @@ proto::MapBuilderOptions CreateMapBuilderOptions(
       parameter_dictionary->GetBool("use_trajectory_builder_3d"));
   options.set_num_background_threads(
       parameter_dictionary->GetNonNegativeInt("num_background_threads"));
+  options.set_collate_by_trajectory(
+      parameter_dictionary->GetBool("collate_by_trajectory"));
   *options.mutable_pose_graph_options() = CreatePoseGraphOptions(
       parameter_dictionary->GetDictionary("pose_graph").get());
   CHECK_NE(options.use_trajectory_builder_2d(),
@@ -279,7 +281,8 @@ std::map<int, int> MapBuilder::LoadState(
   // Set global poses of landmarks.
   for (const auto& landmark : pose_graph_proto.landmark_poses()) {
     pose_graph_->SetLandmarkPose(landmark.landmark_id(),
-                                 transform::ToRigid3(landmark.global_pose()));
+                                 transform::ToRigid3(landmark.global_pose()),
+                                 true);
   }
 
   MapById<SubmapId, mapping::proto::Submap> submap_id_to_submap;
